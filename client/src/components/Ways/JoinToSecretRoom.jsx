@@ -9,7 +9,7 @@ export default function JoinToSecretRoom({handleJoinToSecretRoom}) {
   }
 
   function handleChange(e) {
-    setRoomId(e.value)
+    setRoomId(e.target.value)
   }
 
   return (
@@ -18,7 +18,7 @@ export default function JoinToSecretRoom({handleJoinToSecretRoom}) {
         Join to secret room
       </h2>
 
-      <form onChange={handleSubmit}>
+      <form onSubmit={handleSubmit}>
         <input onChange={handleChange} value={roomId} type="text" placeholder="Type id room" />
         <button>Join</button>
       </form>

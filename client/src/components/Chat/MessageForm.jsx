@@ -1,9 +1,9 @@
 import React, {useRef, useEffect} from 'react'
 
-import { MESSAGES_KEY } from '../../constants/local-storage-keys';
+import { SECRET_CHATS } from '../../constants/local-storage-keys';
 import { MESSAGE_RECEIVED, SEND_MESSAGE } from '../../constants/socket-events';
 
-export default function MessageForm({setMessages, userId, userName, socket}) {
+export default function MessageForm({roomId, setMessages, userId, userName, socket}) {
   const messageRef = useRef()
 
   function sendMessage(e) {
@@ -15,21 +15,29 @@ export default function MessageForm({setMessages, userId, userName, socket}) {
 
     messageRef.current.value = ""
 
-    const prevMessages = JSON.parse(localStorage.getItem(MESSAGES_KEY)) ?? []
+    let secretChats = JSON.parse(localStorage.getItem(SECRET_CHATS)) ?? {}
+    let currentSecretChat = secretChats[roomId] ?? {}
+    const prevMessages = currentSecretChat.messages ?? []
     const newMessages = [...prevMessages, {id: prevMessages.length, senderId, senderName, text}]
-    localStorage.setItem(MESSAGES_KEY, JSON.stringify(newMessages))
+    currentSecretChat = {...currentSecretChat, messages: newMessages}
+    secretChats = {...secretChats, [roomId]: currentSecretChat}
+    localStorage.setItem(SECRET_CHATS, JSON.stringify(secretChats))
 
     setMessages(newMessages)
 
-    socket.emit(SEND_MESSAGE, {senderId, senderName, text})
+    socket.emit(SEND_MESSAGE, {senderId, senderName, text, roomId})
   }
 
   useEffect(() => {
     socket?.on(MESSAGE_RECEIVED, ({senderId, senderName, text}) => {
 
-      const prevMessages = JSON.parse(localStorage.getItem(MESSAGES_KEY)) ?? []
+      let secretChats = JSON.parse(localStorage.getItem(SECRET_CHATS)) ?? {}
+      let currentSecretChat = secretChats[roomId] ?? {}
+      const prevMessages = currentSecretChat.messages ?? []
       const newMessages = [...prevMessages, {id: prevMessages.length, senderId, senderName, text}]
-      localStorage.setItem(MESSAGES_KEY, JSON.stringify(newMessages))
+      currentSecretChat = {...currentSecretChat, messages: newMessages}
+      secretChats = {...secretChats, [roomId]: currentSecretChat}
+      localStorage.setItem(SECRET_CHATS, JSON.stringify(secretChats))
 
       setMessages(newMessages)
     })

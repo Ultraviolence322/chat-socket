@@ -4,7 +4,7 @@ import MessageForm from './MessageForm'
 
 import { MESSAGES_KEY } from '../../constants/local-storage-keys';
 
-export default function GeneralChat({userName, userId, socket, messages, setMessages}) {
+export default function GeneralChat({userName, userId, socket, messages, setMessages, roomId}) {
 
   function clearMessages() {
     localStorage.setItem(MESSAGES_KEY, JSON.stringify([]))
@@ -17,7 +17,7 @@ export default function GeneralChat({userName, userId, socket, messages, setMess
         <button onClick={clearMessages}>Clear messages</button>
       </div>
       <ChatWindow messages={messages} />
-      <MessageForm  setMessages={setMessages} userName={userName} userId={userId} socket={socket}/>
+      <MessageForm roomId={roomId} setMessages={setMessages} userName={userName} userId={userId} socket={socket}/>
     </div>
   )
 }

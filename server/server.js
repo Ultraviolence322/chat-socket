@@ -2,6 +2,8 @@ const SEND_MESSAGE = 'send-message';
 const MESSAGE_RECEIVED = 'message-received';
 const NEW_USER = 'new-user';
 const USER_LEFT = 'user-left';
+const JOIN_ROOM = 'join-room';
+const LEFT_ROOM = 'left-room';
 
 const { instrument } = require('@socket.io/admin-ui');
 const httpServer = require('http').createServer();
@@ -14,18 +16,23 @@ const io = require('socket.io')(httpServer, {
 const users = [];
 
 io.on('connection', (socket) => {
-  const { userId, name } = socket.handshake.query;
+  const { userId, userName } = socket.handshake.query;
+  users.push({ userId, userName });
 
-  users.push({ userId, name });
-
-  socket.broadcast.emit(NEW_USER, name, userId);
-
-  socket.on('disconnect', () => {
-    socket.broadcast.emit(USER_LEFT, name, userId);
+  socket.on(SEND_MESSAGE, ({ senderId, senderName, text, roomId }) => {
+    socket.to(roomId).emit(MESSAGE_RECEIVED, { senderId, senderName, text });
   });
 
-  socket.on(SEND_MESSAGE, ({ senderId, senderName, text }) => {
-    socket.broadcast.emit(MESSAGE_RECEIVED, { senderId, senderName, text });
+  socket.on(JOIN_ROOM, (roomId) => {
+    socket.join(roomId);
+
+    socket.to(roomId).emit(NEW_USER, userName, userId);
+  });
+
+  socket.on(LEFT_ROOM, (roomId) => {
+    socket.join(roomId);
+
+    socket.to(roomId).emit(USER_LEFT, userName, userId);
   });
 });
 
