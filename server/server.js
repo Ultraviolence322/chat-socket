@@ -2,6 +2,7 @@ const SEND_MESSAGE = 'send-message';
 const MESSAGE_RECEIVED = 'message-received';
 const CLOSE_SOCKET = 'close-socket';
 const NEW_USER = 'new-user';
+const USER_LEFT = 'user-left';
 
 const { instrument } = require('@socket.io/admin-ui');
 const httpServer = require('http').createServer();
@@ -16,9 +17,14 @@ const users = [];
 io.on('connection', (socket) => {
   const { userId, name } = socket.handshake.query;
 
+  users.push({ userId, name });
+
   socket.broadcast.emit(NEW_USER, name, userId);
 
-  users.push({ userId, name });
+  socket.on('disconnect', () => {
+    socket.broadcast.emit(USER_LEFT, name, userId);
+  });
+
   socket.on(SEND_MESSAGE, ({ senderId, senderName, text }) => {
     socket.broadcast.emit(MESSAGE_RECEIVED, { senderId, senderName, text });
   });

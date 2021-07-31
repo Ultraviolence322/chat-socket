@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import { v4 as uuidv4 } from 'uuid';
 
 import { MESSAGES_KEY } from '../../constants/local-storage-keys';
-import { CLOSE_SOCKET, NEW_USER } from '../../constants/socket-events';
+import { CLOSE_SOCKET, NEW_USER, USER_LEFT } from '../../constants/socket-events';
 
 import GeneralChat from '../Chat/GeneralChat';
 import NameManager from '../Name/NameManager';
@@ -25,6 +25,15 @@ function App() {
 
     socket.on(NEW_USER, (senderName, senderId) => {
       const text = `${senderName} open the chat`
+      const prevMessages = JSON.parse(localStorage.getItem(MESSAGES_KEY)) ?? []
+      const newMessages = [...prevMessages, {id: prevMessages.length, senderId, senderName, text}]
+      localStorage.setItem(MESSAGES_KEY, JSON.stringify(newMessages))
+
+      setMessages(newMessages)
+    })
+
+    socket.on(USER_LEFT, (senderName, senderId) => {
+      const text = `${senderName} left the chat`
       const prevMessages = JSON.parse(localStorage.getItem(MESSAGES_KEY)) ?? []
       const newMessages = [...prevMessages, {id: prevMessages.length, senderId, senderName, text}]
       localStorage.setItem(MESSAGES_KEY, JSON.stringify(newMessages))
