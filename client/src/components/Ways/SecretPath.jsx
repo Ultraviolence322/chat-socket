@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import { v4 as uuidv4 } from 'uuid';
 
 import { MESSAGES_KEY } from '../../constants/local-storage-keys';
-import { CLOSE_SOCKET, NEW_USER, USER_LEFT } from '../../constants/socket-events';
+import { NEW_USER, USER_LEFT } from '../../constants/socket-events';
 
 import GeneralChat from '../Chat/GeneralChat';
 import NameManager from '../Name/NameManager';
@@ -42,8 +42,6 @@ function App() {
     })
 
     return () => {
-      socket.emit(CLOSE_SOCKET, userName)
-      
       socket.close()
     }
   }, [])

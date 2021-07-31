@@ -1,6 +1,5 @@
 const SEND_MESSAGE = 'send-message';
 const MESSAGE_RECEIVED = 'message-received';
-const CLOSE_SOCKET = 'close-socket';
 const NEW_USER = 'new-user';
 const USER_LEFT = 'user-left';
 
@@ -27,15 +26,6 @@ io.on('connection', (socket) => {
 
   socket.on(SEND_MESSAGE, ({ senderId, senderName, text }) => {
     socket.broadcast.emit(MESSAGE_RECEIVED, { senderId, senderName, text });
-  });
-
-  socket.on(CLOSE_SOCKET, (userName) => {
-    const text = `${userName} leave the chat`;
-    socket.broadcast.emit(MESSAGE_RECEIVED, {
-      senderId: userId,
-      senderName: null,
-      text,
-    });
   });
 });
 
