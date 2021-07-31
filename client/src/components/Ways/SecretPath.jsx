@@ -66,8 +66,6 @@ function App() {
       })
     }
 
-    
-
     return () => {
       if (socket) {
         socket.removeAllListeners(NEW_USER);
