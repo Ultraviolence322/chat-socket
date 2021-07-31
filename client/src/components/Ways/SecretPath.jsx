@@ -7,12 +7,16 @@ import { NEW_USER, USER_LEFT } from '../../constants/socket-events';
 
 import GeneralChat from '../Chat/GeneralChat';
 import NameManager from '../Name/NameManager';
+import JoinToSecretRoom from './JoinToSecretRoom'
+import CreateSecretRoom from './CreateSecretRoom'
 
 function App() {
   const [userId, setUserId] = useState()
   const [userName, setUserName] = useState('nobody')
   const [socket, setSocket] = useState()
   const [messages, setMessages] = useState([])
+  const [isSign, setIsSign] = useState(false)
+  const [roomId, setRoomId] = useState()
 
   useEffect(() => {
     const userId = uuidv4();
@@ -46,20 +50,49 @@ function App() {
     }
   }, [])
 
+  function handleJoinToSecretRoom(id) {
+    setRoomId(id)
+    setIsSign(true)
+  }
 
+  function handleCreateSecretRoom(id) {
+    setRoomId(id)
+    setIsSign(true)
+  }
+
+ function handleCloseChat() {
+    setRoomId(null)
+    setIsSign(false)
+  }
 
   return (
     <div>
       <h1>Secret</h1>
       Your id - {userId}
-      <NameManager userName={userName} setUserName={setUserName}/>
-      <GeneralChat 
-        messages={messages} 
-        setMessages={setMessages} 
-        userId={userId} 
-        userName={userName} 
-        socket={socket}
-      />
+
+      { !isSign && 
+        <div>
+          <NameManager userName={userName} setUserName={setUserName}/>
+
+          <JoinToSecretRoom handleJoinToSecretRoom={handleJoinToSecretRoom} />
+          <hr />
+          <CreateSecretRoom handleCreateSecretRoom={handleCreateSecretRoom} />
+        </div>
+      }
+
+      { isSign && 
+        <div>
+          Chat id - {roomId}
+          <GeneralChat 
+            messages={messages} 
+            setMessages={setMessages} 
+            userId={userId} 
+            userName={userName} 
+            socket={socket}
+          />
+          <button onClick={handleCloseChat}>Close chat</button>
+        </div>
+      }
     </div>
   )
 }
