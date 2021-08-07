@@ -78,13 +78,13 @@ function App() {
   function handleJoinToSecretRoom(id) {
     setRoomId(id)
     setIsSign(true)
-    socket.emit(JOIN_ROOM, id)
+    socket.emit(JOIN_ROOM, id, userName)
   }
 
   function handleCreateSecretRoom(id) {
     setRoomId(id)
     setIsSign(true)
-    socket.emit(JOIN_ROOM, id)
+    socket.emit(JOIN_ROOM, id, userName)
   }
 
  function handleCloseChat() {
@@ -118,8 +118,8 @@ function App() {
             userName={userName} 
             socket={socket}
             roomId={roomId}
+            handleCloseChat={handleCloseChat}
           />
-          <button onClick={handleCloseChat}>Close chat</button>
         </div>
       }
     </div>

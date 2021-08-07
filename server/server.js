@@ -16,14 +16,15 @@ const io = require('socket.io')(httpServer, {
 const users = [];
 
 io.on('connection', (socket) => {
-  const { userId, userName } = socket.handshake.query;
+  let { userId, userName } = socket.handshake.query;
   users.push({ userId, userName });
 
   socket.on(SEND_MESSAGE, ({ senderId, senderName, text, roomId }) => {
     socket.to(roomId).emit(MESSAGE_RECEIVED, { senderId, senderName, text });
   });
 
-  socket.on(JOIN_ROOM, (roomId) => {
+  socket.on(JOIN_ROOM, (roomId, name) => {
+    userName = name
     socket.join(roomId);
 
     socket.to(roomId).emit(NEW_USER, userName, userId);
